@@ -4,3 +4,7 @@ main: '${group}.${packageName}.${className}'
 api-version: '1.20.6'
 depend:
   - afashs-lib
+
+commands:
+  jobadmin:
+    description: jobadmin.
