@@ -108,7 +108,7 @@ public class FishBuilder {
            index -= 1;
        }
 
-       itemBuilder.setDisplayName("&f&l[" + ranks.get(index) + "&f&l] " + itemBuilder.build().getItemMeta().getDisplayName()).setNBT("rank", String.valueOf(index));
+       itemBuilder.setDisplayName("&f&l[" + ranks.get(index) + "&f&l] " + itemBuilder.build().getItemMeta().getDisplayName());
 
     }
 
