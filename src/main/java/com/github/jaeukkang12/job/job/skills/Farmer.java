@@ -36,8 +36,12 @@ public class Farmer implements Listener {
         Block block = event.getBlock();
         if (plants.contains(block.getType())) {
             if (clazz >= 1) {
-                event.setDropItems(false);
-                luckSkill(block, (clazz >= 2) ? 2 : 1);
+                if (Math.random() < 0.1) {
+                    block.getDrops().forEach(item -> {
+                        item.setAmount((clazz >= 2) ? 2 : 1);
+                        block.getWorld().dropItemNaturally(block.getLocation(), item);
+                    });
+                }
             }
         }
     }

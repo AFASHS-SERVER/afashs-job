@@ -7,10 +7,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -24,6 +26,7 @@ import static com.github.jaeukkang12.job.Job.getJobManager;
 import static com.github.jaeukkang12.job.Job.getPlugin;
 
 public class Miner implements Listener {
+
 
     final List<Material> ores = List.of(
             Material.STONE, Material.DEEPSLATE, Material.GRANITE, Material.ANDESITE, Material.DIORITE, Material.CALCITE,
@@ -56,9 +59,28 @@ public class Miner implements Listener {
                     }
                 }
             }
-            if (clazz >= 2) {
-                event.setDropItems(false);
-                luckSkill(block, (clazz >= 4) ? 2 : 1);
+            if (clazz >= 3) {
+                if (Math.random() < 0.1) {
+                    block.getDrops().forEach(item -> {
+                        item.setAmount(2);
+                        block.getWorld().dropItemNaturally(block.getLocation(), item);
+                    });
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    public void playerDamageEvent(EntityDamageEvent event) {
+        if (event.getEntity() instanceof Player player) {
+            JobManager jobManager = getJobManager();
+            if (jobManager.getJob(player) == Job.MINER) {
+                if (jobManager.getClass(player) >= 4) {
+                    DamageType damageType = event.getDamageSource().getDamageType();
+                    if (damageType.equals(DamageType.LAVA) || damageType.equals(DamageType.ON_FIRE)) {
+                        event.setCancelled(true);
+                    }
+                }
             }
         }
     }
@@ -73,13 +95,5 @@ public class Miner implements Listener {
                 skill1Cooldown.remove(player);
             }
         }.runTaskLaterAsynchronously(getPlugin(), 10 * 20L);
-    }
-
-    private void luckSkill( Block block, int amount) {
-        Collection<ItemStack> drops = block.getDrops();
-        if (Math.random() < 0.1) {
-            drops = drops.stream().map(itemStack -> itemStack.add(amount)).collect(Collectors.toList());
-        }
-        drops.forEach(itemStack -> block.getWorld().dropItemNaturally(block.getLocation(), itemStack));
     }
 }
